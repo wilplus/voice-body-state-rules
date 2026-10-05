@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HVSB — drzewko TA</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #5c5c5c;
+    --line: #e6e4de;
+    --bg: #f6f4ef;
+    --card: #fff;
+    --yes: #1f7a4d;
+    --no: #b42318;
+    --maybe: #9a6700;
+    --inc: #0b6e4f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 16px/1.45 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  header {
+    padding: 28px 24px 8px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  header h1 { font-size: 22px; margin: 0 0 6px; font-weight: 650; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .next {
+    background: var(--ink);
+    color: #fff;
+    font-size: 16px;
+    padding: 12px 22px;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 16px 24px 48px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .wrap { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .step { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  h2 { margin: 0 0 14px; font-size: 22px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button {
+    font: inherit;
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  .y { background: #d8f3e3; color: var(--yes); }
+  .n { background: #fde8e6; color: var(--no); }
+  .u { background: #fff3d6; color: var(--maybe); }
+  .reset { background: transparent; color: var(--muted); text-decoration: underline; padding: 10px 4px; }
+  .verdict { font-size: 28px; margin: 0 0 8px; }
+  .v-inc { color: var(--inc); }
+  .v-exc { color: var(--no); }
+  .v-may { color: var(--maybe); }
+  .path { font-size: 13px; color: var(--muted); margin: 16px 0 0; }
+  .path span { display: inline-block; margin: 0 6px 6px 0; padding: 3px 8px; background: var(--bg); border-radius: 8px; }
+  aside h3 { margin: 0 0 10px; font-size: 16px; }
+  aside dl { margin: 0; }
+  aside dt { font-weight: 650; margin-top: 12px; }
+  aside dd { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  .ok { color: var(--yes); }
+  .bad { color: var(--no); }
+  footer { max-width: 1080px; margin: 0 auto; padding: 0 24px 40px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HVSB — title/abstract trainer</h1>
+  <p>Didactic cheat-sheet. One record → Yes / No / Unsure → verdict → Next record clears and starts at H.</p>
+</header>
+<div class="wrap">
+  <section class="card" id="panel"></section>
+  <aside class="card">
+    <h3>What the hooks mean</h3>
+    <dl>
+      <dt>H — Humans</dt>
+      <dd>Human participants, any age. Animals / synthetic voice / model-only = No.</dd>
+      <dt>V — Voice measured</dt>
+      <dd>Acoustics (F0, jitter, MFCC…) <em>or</em> judges scoring <em>that</em> talk: speech disturbances, fluency, pauses, verbal content, “how they sounded”. That is still V — Hollandsworth 1978 style. TTS / someone else’s avatar / they only spoke = No. Title says speech anxiety but only a questionnaire, nobody coded the speech = No. EGG, laryngeal EMG, neck accelerometer = V, not B.</dd>
+      <dt>S — State</dt>
+      <dd class="ok">Yes if a psychological state is <strong>induced</strong> (TSST, judges, threat) <strong>or measured</strong> (anxiety “now”, arousal, challenge/threat, mood, emotion, performance pressure; happiness counts if it is the emotion in that study).</dd>
+      <dd class="bad">No if: trait/diagnosis only; actors portray emotion; only exercise, sleep loss, pain, alcohol, noise; “stress” = syllable stress; competence (fluency, English, stuttering counts) with no state measure; bodily / muscle relaxation as a trained skill or treatment effect without a measured mood, anxiety, or stress score. Do not guess: “they gave a speech, so probably threat.”</dd>
+      <dt>B — Body</dt>
+      <dd>HR, HRV, ECG, ICG/CO/TPR/PEP, EDA/GSR, cortisol, EMG (not larynx), EEG, amylase — same people, same study. A questionnaire is not a body signal.</dd>
+      <dt>X5</dt>
+      <dd>Review, meta-analysis, editorial, protocol / registry with no results → Exclude + X5. Chase citations outside the PRISMA flow.</dd>
+      <dt>X6</dt>
+      <dd>Can you read the title/abstract in English? Yes = continue. No = Exclude + X6. Paywall ≠ other language. Sage / APA / Springer in English = Yes.</dd>
+      <dt>Maybe</dt>
+      <dd>Click Unsure when a hook is foggy (no n, unclear if they recorded the body, title in brackets and no methods). No hard No + at least one Unsure = Maybe. That is the trainer matching Rayyan.</dd>
+      <dt>Not a gate</dt>
+      <dd>Biofeedback / closed loop = FEEDBACK tag. ICG and verbal+vocal = charting / PhD hypothesis, not a hook.</dd>
+    </dl>
+  </aside>
+</div>
+<footer>OSF protocol v2 · κ = Exclude vs not-Exclude · your Rayyan click first; this page is only a trainer.</footer>
+<script>
+const steps = {
+  start: {
+    step: "Step 1 / 6",
+    code: "H",
+    q: "H — humans?",
+    hint: "Are the participants human?",
+    y: "v", n: "exH", u: "v"
+  },
+  v: {
+    step: "Step 2 / 6",
+    code: "V",
+    q: "V — was THEIR voice / speech measured?",
+    hint: "Acoustics OR judges scoring the talk (disturbances, fluency, content). Not: they merely spoke, or only an anxiety questionnaire.",
+    y: "s", n: "exV", u: "s"
+  },
+  s: {
+    step: "Step 3 / 6",
+    code: "S",
+    q: "S — a psychological state in THIS study?",
+    hint: "Induced or measured. Fluency, stuttering, or muscle relaxation as the outcome is not S.",
+    y: "b", n: "exS", u: "b"
+  },
+  b: {
+    step: "Step 4 / 6",
+    code: "B",
+    q: "B — a body signal from the same people?",
+    hint: "HR, HRV, EDA, cortisol, ICG, EEG… A questionnaire is not B.",
+    y: "x5", n: "exB", u: "x5"
+  },
+  x5: {
+    step: "Step 5 / 6",
+    code: "X5",
+    q: "X5 — is this a review, meta, editorial, or protocol with no results?",
+    hint: "Yes = Exclude + X5. No = it is empirical → continue. Unsure (old note, no n) = Maybe.",
+    y: "exX5", n: "x6", u: "x6"
+  },
+  x6: {
+    step: "Step 6 / 6",
+    code: "EN",
+    q: "Is the record English?",
+    hint: "YES if the page you are looking at is English (Psychological Reports, Biological Cybernetics, APA…). NO only if the article is in another language. A paywall is not X6.",
+    y: "end", n: "exX6", u: "end"
+  },
+  exH: { end: "Exclude", why: "Not humans (H failed)." },
+  exV: { end: "Exclude", why: "Their voice was not measured (V failed)." },
+  exS: { end: "Exclude", why: "No psychological state in the study (S failed). Competence, stuttering counts, muscle relaxation as a skill, syllable stress, trait, acted emotion, or physical load only ≠ S." },
+  exB: { end: "Exclude", why: "No body signal (B failed)." },
+  exX5: { end: "Exclude + X5", why: "No primary data. CHASE outside the flow, not Maybe." },
+  exX6: { end: "Exclude + X6", why: "Not in English." },
+  end: { end: "RESULT" }
+};
+
+let hole = false;
+let trail = [];
+
+function go(id, label) {
+  if (label) trail.push(label);
+  if (id === "v" || id === "s" || id === "b" || id === "x5" || id === "x6") {
+    const prev = trail[trail.length - 1] || "";
+    if (prev.startsWith("Unsure")) hole = true;
+  }
+  render(id);
+}
+
+function finishKind() {
+  if (hole) return { end: "Maybe", cls: "v-may", why: "No hard No, but at least one hook was unclear. Full text later." };
+  return { end: "Include", cls: "v-inc", why: "H + V + S + B and not X5/X6. Tag FEEDBACK if there is a loop." };
+}
+
+function render(id) {
+  const el = document.getElementById("panel");
+  const node = steps[id];
+  if (node.end) {
+    const fin = id === "end" ? finishKind() : { end: node.end, cls: node.end.startsWith("Include") ? "v-inc" : node.end.startsWith("Maybe") ? "v-may" : "v-exc", why: node.why };
+    el.innerHTML = `
+      <div class="step">Verdict</div>
+      <p class="verdict ${fin.cls}">${fin.end}</p>
+      <p class="hint">${fin.why}</p>
+      <p class="path">${trail.map(t => "<span>"+t+"</span>").join("")}</p>
+      <div class="btns">
+        <button class="next" onclick="reset()">Next record — clear</button>
+        <button class="reset" onclick="reset()">Reset</button>
+      </div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="step">${node.step}</div>
+    <h2>${node.q}</h2>
+    <p class="hint">${node.hint}</p>
+    <div class="btns">
+      <button class="y" onclick="go('${node.y}','Yes · ${node.code}')">Yes</button>
+      <button class="n" onclick="go('${node.n}','No · ${node.code}')">No</button>
+      <button class="u" onclick="go('${node.u}','Unsure · ${node.code}')">Unsure</button>
+    </div>
+    <p class="path">${trail.map(t => "<span>"+t+"</span>").join("")}</p>
+    <div class="btns"><button class="reset" onclick="reset()">Reset</button></div>`;
+}
+
+function reset() { hole = false; trail = []; render("start"); }
+reset();
+</script>
+</body>
+</html>
